@@ -62,8 +62,7 @@ public class User {
     }
 
     public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder){
-        passwordEncoder.matches(loginRequest.password(), this.password); //senha da request e senha da db
-        return false;
+        return passwordEncoder.matches(loginRequest.password(), this.password); //senha da request e senha da db
     }
 
 }
