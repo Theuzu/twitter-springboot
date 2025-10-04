@@ -20,7 +20,15 @@ public class Role {
         this.roleId = roleId;
     }
 
-    //Roples que temos no DB
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    //Roles que temos no DB
     public enum Values {
         ADMIN(1L),
         BASIC(2L);

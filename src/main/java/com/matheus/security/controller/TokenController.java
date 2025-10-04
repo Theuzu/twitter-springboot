@@ -2,6 +2,7 @@ package com.matheus.security.controller;
 
 import com.matheus.security.controller.dto.LoginRequest;
 import com.matheus.security.controller.dto.LoginResponse;
+import com.matheus.security.entities.Role;
 import com.matheus.security.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 @RestController
 public class TokenController {
 
     private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
-    private BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     public TokenController(JwtEncoder jwtEncoder,
                            UserRepository userRepository,
@@ -42,12 +44,21 @@ public class TokenController {
             var now = Instant.now();
             var expiresIn = 300L;
 
-            //atributos do JSON
+
+            //passando informacoes do usuario pelo JWT
+        var scopes = user.get().getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+
+
+            //atributos do JWTs
             var claims = JwtClaimsSet.builder()
                     .issuer("myBackend")//quem gerou o token
                     .subject(user.get().getUserID().toString())//User como dono do token
                     .issuedAt(now)//emissao do token
                     .expiresAt(now.plusSeconds(expiresIn)) //tempo de expiracao
+                    .claim("scope", scopes)
                     .build();
 
             var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue(); //pega jwt dos claims e criptografa
